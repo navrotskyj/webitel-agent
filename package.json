@@ -1,0 +1,95 @@
+{
+  "name": "webitel-agent",
+  "version": "1.0.0",
+  "description": "Webitel call center monitor",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint -c .eslintrc --ext .ts ./src",
+    "start": "npm run build && electron ./dist/main.js --config ~/work/config.json",
+    "pack": "electron-builder --dir"
+  },
+  "main": "dist/main.js",
+  "keywords": [
+    "webitel"
+  ],
+  "author": "i.navrotskyj@gmail.com",
+  "license": "MIT",
+  "build": {
+    "protocols": {
+      "name": "wbt_agent",
+      "schemes": [
+        "wbt_agent"
+      ]
+    },
+    "win": {
+      "icon": "./build/App_Icon.png",
+      "target": [
+        "zip"
+      ]
+    },
+    "icon": "./build/MacOS_Icon.icns",
+    "asar": true,
+    "appId": "webitel.call_center.agent",
+    "npmRebuild": true,
+    "productName": "Webitel agent monitor",
+    "afterSign": "./build/notarize.mjs",
+    "forceCodeSigning": true,
+    "mac": {
+      "bundleVersion": "1",
+      "artifactName": "${productName}.${ext}",
+      "target": "dmg",
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.inherit.plist",
+      "type": "development"
+    },
+    "dmg": {
+      "sign": false,
+      "background": "./build/DMG_Background.tiff",
+      "icon": "./build/MacOS_Icon.icns",
+      "iconSize": 75,
+      "window": {
+        "width": 544,
+        "height": 408
+      },
+      "contents": [
+        {
+          "x": 450,
+          "y": 280
+        },
+        {
+          "x": 450,
+          "y": 170,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "directories": {
+      "output": "packages"
+    },
+    "files": [
+      "package.json",
+      "index.html",
+      "dist/**"
+    ]
+  },
+  "devDependencies": {
+    "@electron/notarize": "^3.0.1",
+    "@electron/osx-sign": "^2.0.0",
+    "@types/webrtc": "^0.0.46",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "electron": "^v36.3.2",
+    "electron-builder": "^26.0.12",
+    "eslint": "^7.32.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "webitel-sdk": "^25.5.3"
+  }
+}
