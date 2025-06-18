@@ -42,7 +42,7 @@ async function create(config: Config, token: string) {
         return;
 
     // const token = 'IHOR'
-    const storageCapture = `https://dev.webitel.com/storage/webrtc/upload/video?access_token=${token}&channel=call`
+    const storageCapture =    `https://dev.webitel.com/api/storage/p2p/upload/video?channel=call`
     const storageScreenshot = `https://dev.webitel.com/api/storage/file/screenshot/upload?access_token=${token}&channel=screenshot`
 
 
@@ -106,7 +106,7 @@ async function create(config: Config, token: string) {
     try {
         await client.connect();
         await client.auth()
-        await client.subscribeCall(handlerCall(constraints, config.iceServers, storageCapture))
+        await client.subscribeCall(handlerCall(token, constraints, config.iceServers, storageCapture))
         console.debug(`opened session ${client.instanceId}`)
 
         agent = await client.agentSession()

@@ -3,12 +3,13 @@ import {StorageScreenCapture} from "./storageScreen";
 
 const screenCaptureSession = new Map<string, StorageScreenCapture>
 
-export function handlerCall(constraints: DisplayMediaStreamOptions, iceServers: RTCIceServer[], captureUrl: string) {
+export function handlerCall(token: string, constraints: DisplayMediaStreamOptions, iceServers: RTCIceServer[], captureUrl: string) {
    return async function handleCall(action: CallActions, call: Call) : Promise<void> {
 
         switch (action) {
             case CallActions.Ringing:
                 await startCapture(
+                    token,
                     call.parentId || call.id,
                     captureUrl,
                     constraints,
@@ -30,9 +31,9 @@ async function stopCapture(callId: string) {
     }
 }
 
-async function startCapture(callId: string, uri: string, constraints: DisplayMediaStreamOptions, iceServers: RTCIceServer[]) {
+async function startCapture(token: string, callId: string, uri: string, constraints: DisplayMediaStreamOptions, iceServers: RTCIceServer[]) {
     console.debug(`start capture call ${callId} to ${uri}`)
-    const capture = new StorageScreenCapture(callId, iceServers, uri)
+    const capture = new StorageScreenCapture(callId, iceServers, uri, token)
     try {
         const stream = await navigator.mediaDevices.getDisplayMedia(constraints)
         await capture.cast(stream)

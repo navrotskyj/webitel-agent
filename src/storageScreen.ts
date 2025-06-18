@@ -4,9 +4,11 @@ export class StorageScreenCapture {
     sdpResolver: string
     stream: MediaStream | null
     pc: RTCPeerConnection
-    constructor(id: string, iceServers: RTCIceServer[], sdpResolver: string) {
+    token: string
+    constructor(id: string, iceServers: RTCIceServer[], sdpResolver: string, token: string) {
         this.id = id
         this.sdpResolver = sdpResolver
+        this.token = token
         this.stream = null
         const pc = new RTCPeerConnection({
             iceServers,
@@ -27,7 +29,7 @@ export class StorageScreenCapture {
             }
             const request = {
                 type: pc.localDescription.type,
-                sdp: pc.localDescription.sdp,
+                sdp_offer: pc.localDescription.sdp,
                 uuid: this.id,
                 name: `${new Date().toISOString()}`
             }
@@ -38,6 +40,9 @@ export class StorageScreenCapture {
                 const sdp = JSON.stringify(request)
                 const response = await fetch(this.sdpResolver, {
                     method: "POST",
+                    headers: {
+                      "X-Webitel-Access": this.token,
+                    },
                     body: sdp,
                 });
 
@@ -49,9 +54,12 @@ export class StorageScreenCapture {
             }
 
             console.info('local sdp\n', pc.localDescription.sdp)
-            console.info('remote sdp\n', remoteSdp.sdp)
+            console.info('remote sdp\n', remoteSdp.sdp_answer)
 
-            await pc.setRemoteDescription(remoteSdp)
+            await pc.setRemoteDescription({
+                type: "answer",
+                sdp: remoteSdp.sdp_answer,
+            })
         }
         pc.addTransceiver('video', { direction: 'sendrecv' });
     }
