@@ -13,6 +13,10 @@ export async function createWindow(dev: boolean, argv: string[]) : Promise<void>
     if (!configPath) {
         configPath = join(app.getPath('userData'), '/config.json')
     }
+
+    console.log(app.getPath('userData'))
+    console.error(configPath)
+
     const config =  await loadConfig(configPath)
 
     const appIcon = nativeImage.createFromPath(
@@ -37,6 +41,8 @@ export async function createWindow(dev: boolean, argv: string[]) : Promise<void>
 
         },
     });
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
     allowScreeCapture()
     initScreenShot()
     await createTray(mainWindow, config)
@@ -45,8 +51,7 @@ export async function createWindow(dev: boolean, argv: string[]) : Promise<void>
     // and load the index.html of the app.
     mainWindow.loadFile(join(__dirname, "../index.html"));
 
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+
 
     // mainWindow.setSkipTaskbar(true);
 }

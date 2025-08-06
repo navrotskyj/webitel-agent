@@ -6,7 +6,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "eslint -c .eslintrc --ext .ts ./src",
-    "start": "npm run build && electron ./dist/main.js --config ~/work/config.json",
+    "start": "npm run build && electron ./dist/main.js",
     "pack": "electron-builder --dir"
   },
   "main": "dist/main.js",
@@ -90,6 +90,6 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "webitel-sdk": "^25.5.3"
+    "webitel-sdk": "^25.5.7"
   }
 }

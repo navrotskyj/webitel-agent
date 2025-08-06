@@ -42,7 +42,7 @@ async function create(config: Config, token: string) {
         return;
 
     // const token = 'IHOR'
-    const storageCapture =    `https://dev.webitel.com/api/storage/p2p/upload/video?channel=call`
+    const storageCapture =    `https://dev.webitel.com/api/webrtc/video`
     const storageScreenshot = `https://dev.webitel.com/api/storage/file/screenshot/upload?access_token=${token}&channel=screenshot`
 
 
@@ -51,12 +51,13 @@ async function create(config: Config, token: string) {
     }
 
     client = new Client({
-        endpoint: config.ws,
+        // endpoint: 'ws://10.10.10.25:10022',// config.ws,
+        endpoint: 'wss://dev.webitel.com/ws',// config.ws,
         token,
         registerWebDevice: false,
-        debug: false,
-        logLvl: 'info',
+        debug: true,
         screenResolver: screenResolver,
+        applicationName: 'desc_track'
 
     })
 
@@ -125,5 +126,7 @@ async function create(config: Config, token: string) {
 }
 
 ipcRenderer.on('on-config', (e: any, conf: Config, token: string) => {
-    create(conf, token)
+    setTimeout(()=> {
+        create(conf, token)
+    }, 1000)
 })

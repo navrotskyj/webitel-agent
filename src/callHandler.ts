@@ -8,6 +8,7 @@ export function handlerCall(token: string, constraints: DisplayMediaStreamOption
 
         switch (action) {
             case CallActions.Ringing:
+                console.error('ring', call)
                 await startCapture(
                     token,
                     call.parentId || call.id,
@@ -17,6 +18,7 @@ export function handlerCall(token: string, constraints: DisplayMediaStreamOption
                 )
                 break
             case CallActions.Destroy:
+                console.error('destroy', call)
                 await stopCapture(call.parentId || call.id)
                 break
         }
@@ -28,17 +30,22 @@ async function stopCapture(callId: string) {
     if (capture) {
         capture.close()
         screenCaptureSession.delete(callId)
+    } else {
+        throw 'aaaa'
     }
 }
 
 async function startCapture(token: string, callId: string, uri: string, constraints: DisplayMediaStreamOptions, iceServers: RTCIceServer[]) {
     console.debug(`start capture call ${callId} to ${uri}`)
     const capture = new StorageScreenCapture(callId, iceServers, uri, token)
+    screenCaptureSession.set(callId, capture)
     try {
         const stream = await navigator.mediaDevices.getDisplayMedia(constraints)
         await capture.cast(stream)
-        screenCaptureSession.set(callId, capture)
+        console.error(capture)
     } catch (e) {
         console.error(e)
+        capture.close()
+        screenCaptureSession.delete(callId)
     }
 }

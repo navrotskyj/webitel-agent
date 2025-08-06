@@ -14,7 +14,7 @@ export interface Config {
 
 export async function  loadConfig(path: string) : Promise<Config> {
     let config = {
-        ws: "wss://dev.webitel.com/ws",
+        ws: "wss://suite.webitel.com/ws",
         iceServers: [],
         constraints: null
     } as Config
