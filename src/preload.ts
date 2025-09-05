@@ -7,12 +7,13 @@ import {ipcRenderer} from "electron"
 import {handlerCall} from "./callHandler";
 import {Config} from "./config";
 import {AgentStatusEvent} from "webitel-sdk/types/socket/agent";
+import * as console from "node:console";
 
 const constraints = {
     video: {
         width: { ideal: 1920 },    // Бажана ширина 1920px (Full HD)
         height: { ideal: 1080 },   // Бажана висота 1080px
-        frameRate: { ideal: 30 },  // Бажана частота кадрів 30fps
+        frameRate: { ideal: 10 },  // Бажана частота кадрів 30fps
         cursor: "always",          // Завжди показувати курсор
         displaySurface: "monitor", // Можна додати для попереднього вибору всього екрану, але це лише підказка
         selfBrowserSurface: "exclude", // Виключити поточну вкладку, щоб уникнути "ефекту дзеркала"
@@ -107,6 +108,14 @@ async function create(config: Config, token: string) {
     try {
         await client.connect();
         await client.auth()
+        //@ts-ignore
+        const oldf = client.socket.socket.onmessage;
+        //@ts-ignore
+        client.socket.socket.onmessage = (e: any) => {
+            ipcRenderer.send('socket_ev', e.data)
+            oldf(e)
+        }
+
         await client.subscribeCall(handlerCall(token, constraints, config.iceServers, storageCapture))
         console.debug(`opened session ${client.instanceId}`)
 

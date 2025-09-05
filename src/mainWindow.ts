@@ -1,10 +1,11 @@
 import {join} from "path";
-import {app, BrowserWindow, nativeImage} from "electron";
+import {app, BrowserWindow, nativeImage, ipcMain} from "electron";
 import {loadConfig} from "./config";
 import {allowScreeCapture} from "./screencapture";
 import {initScreenShot} from "./screenshot";
 import {createTray} from "./tray";
 import {subscribePowerMonitor} from "./powerMonitor";
+import * as console from "node:console";
 
 
 export async function createWindow(dev: boolean, argv: string[]) : Promise<void> {
@@ -13,6 +14,109 @@ export async function createWindow(dev: boolean, argv: string[]) : Promise<void>
     if (!configPath) {
         configPath = join(app.getPath('userData'), '/config.json')
     }
+
+    let callStore = [] as any[];
+    let taskStore = [] as any[];
+
+    function appendCall(e: any) {
+        callStore.push(e)
+
+        if (callStore.length === 1) {
+            console.error('start record')
+        }
+    }
+
+    function getCall(id: string) {
+        return callStore.filter(i => i.id === id)[0]
+    }
+
+    function delCall(id: string) {
+        const callEv = getCall(id)
+        if (callEv && hasTask(callEv)) {
+            // постобробка
+            return
+        }
+
+        callStore = callStore.filter(i => i.id != id)
+        if (!callStore.length) {
+            console.error('stop record')
+        }
+    }
+
+    function delCallByAttempt(attemptId: number) {
+        callStore = callStore.filter(i => {
+            return  (i.queue && +i.queue.attempt_id === attemptId)
+        })
+        if (!callStore.length) {
+            console.error('stop record')
+        }
+    }
+
+    function appendTask(e: any) {
+        taskStore.push(e)
+    }
+
+    function delTask(id:any) {
+        taskStore = taskStore.filter(i => i.attempt_id != id)
+        delCallByAttempt(id)
+    }
+
+    function hasTask(callEv: any) {
+        if (!(callEv.data && callEv.data.queue)) {
+            return false
+        }
+        const attId =  +callEv.data.queue.attempt_id
+        for (let t of taskStore) {
+            if (t.attempt_id === attId) {
+                return true
+            }
+        }
+        return false
+    }
+
+    ipcMain.on('socket_ev', (s: any, val: string) => {
+        const e = JSON.parse(val)
+        if (e.event) {
+            switch (e.event) {
+                case "call": {
+                    const call = e.data[e.event];
+                    switch (call.event) {
+                        case "ringing":
+                            appendCall(call)
+                            break;
+                        case "hangup":
+                            delCall(call.id)
+                            break;
+                    }
+                    break;
+                }
+
+                case "channel": {
+                    const ch = e.data;
+                    switch (ch.status) {
+                        case "distribute": {
+                            appendTask(ch)
+                            break
+                        }
+
+                        case "missed":
+                        case "wrap_time":
+                        case "waiting":
+                        case "transfer": {
+                            delTask(ch.attempt_id)
+                            break
+                        }
+
+                    }
+
+
+                    break;
+                }
+            }
+            console.error(e)
+        }
+
+    })
 
     console.log(app.getPath('userData'))
     console.error(configPath)
