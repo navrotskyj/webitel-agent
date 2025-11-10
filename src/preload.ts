@@ -47,13 +47,26 @@ async function create(config: Config, token: string) {
     const storageScreenshot = `https://dev.webitel.com/api/storage/file/screenshot/upload?access_token=${token}&channel=screenshot`
 
 
-    const screenResolver = () => {
-        return navigator.mediaDevices.getDisplayMedia(constraints)
+    const screenResolver  = async () => {
+        const s = await  navigator.mediaDevices.getDisplayMedia(constraints)
+        // const s2 = await  navigator.mediaDevices.getUserMedia({audio: false, video: true})
+        console.error("aaaaaaaa")
+        // const m = new MediaStream()
+        // s.getVideoTracks().forEach(track => {m.addTrack(track)})
+        // s2.getVideoTracks().forEach(track => {m.addTrack(track)})
+        return s
+    }
+
+    async function  test() {
+        const pc = new RTCPeerConnection({})
+        this.pc.addTransceiver('video', { direction: 'sendrecv' })
+
     }
 
     client = new Client({
         // endpoint: 'ws://10.10.10.25:10022',// config.ws,
         endpoint: 'wss://dev.webitel.com/ws',// config.ws,
+        // endpoint: 'wss://test.webitel.me/ws',// config.ws,
         token,
         registerWebDevice: false,
         debug: true,

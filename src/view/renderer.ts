@@ -14,6 +14,8 @@ const log = (msg: string) => {
 
 const screenshotImageElement = document.getElementById('screenshotDisplay') as HTMLImageElement;
 
+
+
 let stream : MediaStream;
 let currentScreenshotBase64 = null;
 
@@ -50,7 +52,8 @@ function testStop() {
 }
 
 async function testStartAgent() {
-    console.error("OK")
+    //@ts-ignore
+    console.error("OK", window.cli)
     try {
         const constraints = {
             video: {
@@ -67,7 +70,7 @@ async function testStartAgent() {
             audio: false // Залежить від ваших потреб
         };
         //@ts-ignore
-        await window.cli.requestScreenShare(8535, constraints, (s: MediaStream)=> {
+        await window.cli.spyScreen(8535, constraints, (s: MediaStream)=> {
             const video =document.getElementById('testVideo') as HTMLVideoElement;
             video.srcObject = s
             video.play()

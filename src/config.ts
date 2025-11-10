@@ -22,6 +22,8 @@ export async function  loadConfig(path: string) : Promise<Config> {
     try {
         const file = await readFileSync(path, {encoding: 'utf-8'})
         config = JSON.parse(file)
+        // @ts-ignore
+        config.iceServers = [{ urls: ['stun:stun.l.google.com:19302'] }];
     } catch (e) {
         await writeFileSync(path, JSON.stringify(config), {encoding: 'utf-8'})
     }

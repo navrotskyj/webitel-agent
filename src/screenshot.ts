@@ -26,7 +26,13 @@ export async function screenshot(sendUrl?: string): Promise<string> {
 
         const base64Data = screenshotImage.toDataURL();
 
-        await axios.post(`${sendUrl}&name=${
+
+        console.error(`${sendUrl}&thumbnail=true&name=${
+            // await axios.post(`http://10.10.10.25:10023/api/v2/file/screenshot/upload?access_token=IHOR&channel=screenshot&name=${
+            new Date().toISOString()
+        }.png`)
+
+        await axios.post(`${sendUrl}&thumbnail=true&name=${
                 // await axios.post(`http://10.10.10.25:10023/api/v2/file/screenshot/upload?access_token=IHOR&channel=screenshot&name=${
                 new Date().toISOString()
             }.png`,

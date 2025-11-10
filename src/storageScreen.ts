@@ -2,7 +2,7 @@
 export class StorageScreenCapture {
     id: string
     sdpResolver: string
-    stream: MediaStream | null
+    stream: MediaStream[] | null
     pc: RTCPeerConnection
     token: string
     offerOptions: RTCOfferOptions
@@ -118,7 +118,9 @@ export class StorageScreenCapture {
 
     close(): void {
         if (this.stream) {
-            this.stream.getTracks().forEach(t => t.stop())
+            this.stream.forEach(s => {
+                s.getTracks().forEach(t => t.stop())
+            })
             this.stream = null
         }
 
@@ -128,12 +130,14 @@ export class StorageScreenCapture {
         }
     }
 
-    async cast(stream: MediaStream) : Promise<void> {
+    async cast(stream: MediaStream[]) : Promise<void> {
         const pc = this.pc
         this.stream = stream
-        stream.getTracks().forEach(track => {
-            console.error(track.getConstraints())
-            pc.addTrack(track, stream)
+        stream.forEach(s => {
+            s.getTracks().forEach(track => {
+                console.error(track.getConstraints())
+                pc.addTrack(track, s)
+            })
         })
         const offer = await pc.createOffer(this.offerOptions)
         await pc.setLocalDescription(offer)

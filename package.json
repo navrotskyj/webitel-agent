@@ -90,6 +90,6 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "webitel-sdk": "^25.5.7"
+    "webitel-sdk": "^25.10.1"
   }
 }

@@ -1,7 +1,7 @@
 import {join} from "path";
 import {app, BrowserWindow, nativeImage, ipcMain} from "electron";
 import {loadConfig} from "./config";
-import {allowScreeCapture} from "./screencapture";
+import {allowScreeCapture, listSources} from "./screencapture";
 import {initScreenShot} from "./screenshot";
 import {createTray} from "./tray";
 import {subscribePowerMonitor} from "./powerMonitor";
@@ -158,6 +158,8 @@ export async function createWindow(dev: boolean, argv: string[]) : Promise<void>
 
 
     // mainWindow.setSkipTaskbar(true);
+
+    await listSources(mainWindow)
 }
 
 function parseArguments(argv: string[]): string | null {
